@@ -4,9 +4,10 @@ import React, { useState } from "react";
 import { FcGoogle } from "react-icons/fc";
 import sideBarImage from "../../../public/Images/sideImage.png";
 import Link from "next/link";
-import toast from "react-hot-toast";
+import toast, { Toaster } from "react-hot-toast";
 import axios from "axios";
-import { useRouter } from "next/navigation"; 
+import { useRouter } from "next/navigation";
+
 const Register = () => {
   const [data, setData] = useState({
     email: "",
@@ -15,19 +16,25 @@ const Register = () => {
   });
 
   const [loading, setLoading] = useState(false);
-
   const router = useRouter();
 
-  const handleSubmit = async (e : any) => { // Removed type annotation from e
+  const handleSubmit = async (e : any) => {
+    e.preventDefault();
+
+    // Basic form validation
+    if (!data.username || !data.email || !data.password) {
+      toast.error("Please fill in all fields.");
+      return;
+    }
+
     try {
-      e.preventDefault(); // Changed from e.preventDefaults()
       setLoading(true);
-      const response = await axios.post("api/register", data); // Changed from responce to response
+      const response = await axios.post("/api/register", data);
       console.log("register res==>", response);
       router.push("/login");
-    } catch (error : any) { // Removed type annotation from error
+    } catch (error : any) {
       console.log("error", error);
-      toast.error(error.message);
+      toast.error("Failed to create account. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -35,6 +42,7 @@ const Register = () => {
 
   return (
     <>
+      <Toaster />
       <div className="grid grid-cols-2 container py-20">
         <div className="">
           <Image
@@ -61,7 +69,7 @@ const Register = () => {
             <input
               type="email"
               id="email"
-              placeholder="Email or Phone Number "
+              placeholder="Email or Phone Number"
               className="py-3 text-base focus:outline-none"
               value={data.email}
               onChange={(e) => setData({ ...data, email: e.target.value })}
@@ -69,7 +77,7 @@ const Register = () => {
 
             <hr />
             <input
-              type="password" // Changed to lowercase
+              type="password"
               id="password"
               placeholder="Password"
               className="py-3 text-base focus:outline-none"
@@ -80,11 +88,11 @@ const Register = () => {
             <hr />
 
             <button
-              type="submit" // Added type attribute
+              type="submit"
               className="bg-[#DB4444] py-2.5 px-20 border-2 my-2 mt-5 rounded text-white text-base"
               disabled={loading}
             >
-              Create Account
+              {loading ? "Creating Account..." : "Create Account"}
             </button>
           </form>
           <div className="flex py-2.5 px-20 border-2 my-2 border-slate-200 rounded">
@@ -92,7 +100,7 @@ const Register = () => {
             <button className="ml-5 text-base">Sign up with Google</button>
           </div>
           <div className="flex justify-center mt-5">
-            <p className="text-base mx-5">Already have account?</p>{" "}
+            <p className="text-base mx-5">Already have an account?</p>{" "}
             <Link href="/login" className="underline">
               Log in
             </Link>

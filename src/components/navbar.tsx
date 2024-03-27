@@ -17,6 +17,7 @@ const Navbar = () => {
     { name: "Login", link: "/login" },
     { name: "Register", link: "/register" },
   ];
+
   const [open, setOpen] = useState(false);
   return (
     <>
